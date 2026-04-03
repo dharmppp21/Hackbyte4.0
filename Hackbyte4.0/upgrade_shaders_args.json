@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEditor;\nusing UnityEngine;\nusing System.Collections.Generic;\n\npublic class ShaderUpgrader\n{\n    public static string Upgrade()\n    {\n        string[] guids = AssetDatabase.FindAssets(\"t:Material\");\n        int upgradedCount = 0;\n        Shader urpLit = Shader.Find(\"Universal Render Pipeline/Lit\");\n        if (urpLit == null)\n        {\n            return \"Universal Render Pipeline/Lit shader not found!\";\n        }\n\n        foreach (string guid in guids)\n        {\n            string path = AssetDatabase.GUIDToAssetPath(guid);\n            Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);\n            if (mat != null && (mat.shader.name == \"Standard\" || mat.shader.name == \"Standard (Specular setup)\"))\n            {\n                mat.shader = urpLit;\n                EditorUtility.SetDirty(mat);\n                upgradedCount++;\n            }\n        }\n        AssetDatabase.SaveAssets();\n        return $\"Successfully upgraded {upgradedCount} materials to URP Lit.\";\n    }\n}",
+  "className": "ShaderUpgrader",
+  "methodName": "Upgrade"
+}

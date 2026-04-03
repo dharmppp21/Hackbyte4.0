@@ -1,0 +1,4 @@
+{
+  "filter": "t:Material",
+  "searchInFolders": ["Assets/Models"]
+}
