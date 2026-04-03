@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class FinalAlignmentFix\n{\n    public static string Run()\n    {\n        ClimbController cc = Object.FindObjectOfType<ClimbController>();\n        if (cc == null) return \"No player found in scene.\";\n        \n        GameObject pm = cc.gameObject;\n        pm.transform.localPosition = Vector3.zero;\n\n        return $\"Successfully reset {pm.name} local position to Zero. It was previously at 1.01 Y.\";\n    }\n}",
+  "className": "FinalAlignmentFix",
+  "methodName": "Run"
+}

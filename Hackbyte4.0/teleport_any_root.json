@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class AnyRootTeleporter\n{\n    public static string Run()\n    {\n        ClimbController cc = Object.FindObjectOfType<ClimbController>();\n        if (cc == null) return \"No player found in scene.\";\n        \n        GameObject pm = cc.gameObject;\n        Transform root = pm.transform.root;\n        \n        RaycastHit hit;\n        if (Physics.Raycast(root.position + Vector3.up * 5.0f, Vector3.down, out hit, 100f))\n        {\n            root.position = hit.point + Vector3.up * 0.1f;\n            pm.transform.localPosition = Vector3.zero;\n            return $\"Teleported ROOT {root.name} and PlayerModel {pm.name} to ground at {hit.point}\";\n        }\n        \n        return \"No ground found below the character root.\";\n    }\n}",
+  "className": "AnyRootTeleporter",
+  "methodName": "Run"
+}

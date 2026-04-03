@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class TeleportPlayer\n{\n    public static string Run()\n    {\n        ClimbController cc = Object.FindObjectOfType<ClimbController>();\n        if (cc == null) return \"Player not found (no ClimbController)\";\n        \n        GameObject pm = cc.gameObject;\n        RaycastHit hit;\n        // Raycast from slightly above current position to 100 units down\n        if (Physics.Raycast(pm.transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 100f))\n        {\n            pm.transform.position = hit.point + Vector3.up * 0.05f;\n            return $\"Teleported player {pm.name} to ground: {hit.collider.name} at {hit.point}\";\n        }\n        \n        return \"No ground found below player to teleport to.\";\n    }\n}",
+  "className": "TeleportPlayer",
+  "methodName": "Run"
+}

@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class ClimbRefChecker\n{\n    public static string Check()\n    {\n        GameObject pm = GameObject.Find(\"Player_New/PlayerModel\");\n        if (pm == null) return \"PlayerModel not found\";\n        ClimbController cc = pm.GetComponent<ClimbController>();\n        if (cc == null) return \"ClimbController not found\";\n        \n        string lHand = cc.LHand != null ? cc.LHand.name : \"NULL\";\n        string rHand = cc.RHand != null ? cc.RHand.name : \"NULL\";\n        string lFoot = cc.LFoot != null ? cc.LFoot.name : \"NULL\";\n        string rFoot = cc.RFoot != null ? cc.RFoot.name : \"NULL\";\n        \n        return $\"LHand: {lHand}, RHand: {rHand}, LFoot: {lFoot}, RFoot: {rFoot}\";\n    }\n}",
+  "className": "ClimbRefChecker",
+  "methodName": "Check"
+}

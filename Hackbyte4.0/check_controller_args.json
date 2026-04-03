@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEditor;\nusing UnityEngine;\n\npublic class ControllerChecker\n{\n    public static string Check()\n    {\n        // PlayerModel Animator InstanceID: 54502\n        Animator anim = (Animator)EditorUtility.InstanceIDToObject(54502);\n        if (anim == null) return \"Animator not found\";\n        if (anim.runtimeAnimatorController == null) return \"RuntimeAnimatorController is null\";\n        return $\"Animator Controller: {anim.runtimeAnimatorController.name} (InstanceID: {anim.runtimeAnimatorController.GetInstanceID()})\";\n    }\n}",
+  "className": "ControllerChecker",
+  "methodName": "Check"
+}

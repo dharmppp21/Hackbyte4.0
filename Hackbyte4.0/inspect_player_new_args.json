@@ -1,0 +1,8 @@
+{
+  "gameObjectRef": {
+    "path": "Player_New/PlayerModel"
+  },
+  "includeComponents": true,
+  "includeHierarchy": true,
+  "hierarchyDepth": 1
+}

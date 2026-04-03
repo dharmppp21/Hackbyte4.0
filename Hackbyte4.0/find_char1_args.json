@@ -1,0 +1,4 @@
+{
+  "filter": "char1 t:Model",
+  "searchInFolders": ["Assets/Models"]
+}
