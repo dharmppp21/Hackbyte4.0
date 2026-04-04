@@ -1,0 +1,9 @@
+{
+  "prefabAssetPath": "Assets/Dynamic Parkour System/Prefabs/Player.prefab",
+  "gameObjectPath": "Player_New",
+  "position": {
+    "x": 0,
+    "y": 1,
+    "z": 0
+  }
+}

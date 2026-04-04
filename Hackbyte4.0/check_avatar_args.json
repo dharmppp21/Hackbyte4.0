@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEditor;\nusing UnityEngine;\n\npublic class AvatarChecker\n{\n    public static string Check()\n    {\n        // PlayerModel Animator InstanceID: 54502\n        Animator anim = (Animator)EditorUtility.InstanceIDToObject(54502);\n        if (anim == null) return \"Animator not found on PlayerModel\";\n        if (anim.avatar == null) return \"Avatar is null on PlayerModel Animator\";\n        return $\"Animator Avatar: {anim.avatar.name} (InstanceID: {anim.avatar.GetInstanceID()})\";\n    }\n}",
+  "className": "AvatarChecker",
+  "methodName": "Check"
+}

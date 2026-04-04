@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class ComponentFinder\n{\n    public static string Find()\n    {\n        ClimbController cc = Object.FindObjectOfType<ClimbController>();\n        if (cc == null) return \"ClimbController not found in scene\";\n        return $\"Found ClimbController on GameObject: {cc.gameObject.name} (InstanceID: {cc.gameObject.GetInstanceID()})\";\n    }\n}",
+  "className": "ComponentFinder",
+  "methodName": "Find"
+}

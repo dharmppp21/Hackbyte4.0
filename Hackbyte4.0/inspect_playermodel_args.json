@@ -1,0 +1,7 @@
+{
+  "gameObjectRef": {
+    "path": "Player/PlayerModel"
+  },
+  "includeComponents": true,
+  "includeData": true
+}

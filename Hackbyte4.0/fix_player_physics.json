@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEngine;\nusing Climbing;\n\npublic class FixPlayerPhysics\n{\n    public static string Run()\n    {\n        ClimbController cc = Object.FindObjectOfType<ClimbController>();\n        if (cc == null) return \"Player not found.\";\n        \n        GameObject pm = cc.gameObject;\n        Animator anim = pm.GetComponent<Animator>();\n        Rigidbody rb = pm.GetComponent<Rigidbody>();\n\n        string report = $\"--- Fixing Player: {pm.name} ---\\n\";\n        \n        if (anim != null) {\n            report += $\"Animator.applyRootMotion was {anim.applyRootMotion}. Setting it to FALSE.\\n\";\n            anim.applyRootMotion = false;\n        }\n\n        if (rb != null) {\n            rb.useGravity = true;\n            rb.isKinematic = false;\n            report += \"Ensured Gravity is ON and Kinematic is OFF.\\n\";\n        }\n\n        return report;\n    }\n}",
+  "className": "FixPlayerPhysics",
+  "methodName": "Run"
+}

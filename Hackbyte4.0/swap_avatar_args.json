@@ -1,0 +1,5 @@
+{
+  "csharpCode": "using UnityEditor;\nusing UnityEngine;\nusing System.Linq;\n\npublic class AvatarSwapper\n{\n    public static string Swap()\n    {\n        string modelPath = \"Assets/Models/modelwithrig.fbx\";\n        var assets = AssetDatabase.LoadAllAssetsAtPath(modelPath);\n        Avatar newAvatar = assets.OfType<Avatar>().FirstOrDefault();\n        \n        if (newAvatar == null) \n            return \"New Avatar not found in modelwithrig.fbx. Make sure it's imported as Humanoid.\";\n            \n        Animator anim = (Animator)EditorUtility.InstanceIDToObject(54502);\n        if (anim == null) \n            return \"Animator not found on PlayerModel. Check if instanceID 54502 is still valid.\";\n            \n        anim.avatar = newAvatar;\n        EditorUtility.SetDirty(anim);\n        AssetDatabase.SaveAssets();\n        \n        return $\"Successfully swapped Avatar to: {newAvatar.name} from {modelPath}\";\n    }\n}",
+  "className": "AvatarSwapper",
+  "methodName": "Swap"
+}

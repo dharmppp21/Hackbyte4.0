@@ -1,8 +1,16 @@
 {
   "mcpServers": {
     "ai-game-developer": {
+<<<<<<< HEAD
       "type": "http",
       "url": "https://ai-game.dev/mcp"
+=======
+      "url": "https://ai-game.dev/mcp",
+      "type": "http",
+      "headers": {
+        "Authorization": "Bearer cELKd6-RRQ7xUIu78AHcjfcdRvBlclyIJQOu3u7P6Z0"
+      }
+>>>>>>> _nilanjan
     }
   }
 }
