@@ -25,18 +25,27 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Jump",
+                    "name": "Interact",
                     "type": "Button",
-                    "id": "4a88e738-855e-424a-8aa6-2ea1aa55d74e",
+                    "id": "7279f667-eb65-4bcb-95c3-920969b5b0d3",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interact",
+                    "name": "DodgeLeft",
                     "type": "Button",
-                    "id": "7279f667-eb65-4bcb-95c3-920969b5b0d3",
+                    "id": "8b12b308-1efe-46b7-a48e-2ef3ec7f5dae",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "DodgeRight",
+                    "type": "Button",
+                    "id": "abb8fd07-9e54-44bc-9870-15dd1c6dcd8c",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -134,28 +143,6 @@
                 },
                 {
                     "name": "",
-                    "id": "0f447d17-7d46-4e72-ad6c-dc943591b7b5",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a7a10a4f-66e2-4909-9e58-3248f585b4d6",
-                    "path": "<Gamepad>/buttonSouth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Controller",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "e5abd7ff-c4f7-44f0-81ea-0dfebae6dc91",
                     "path": "<Keyboard>/e",
                     "interactions": "",
@@ -173,6 +160,50 @@
                     "processors": "",
                     "groups": ";Controller",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c0e2a78f-9d1a-4051-a4d9-34fc3194f74f",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "DodgeLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9ff5624a-22be-486b-89f0-7844b54032f0",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Controller",
+                    "action": "DodgeLeft",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1571381-d165-4e60-9b2f-4ec4d1942958",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "DodgeRight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a8fdc22-178c-489c-a563-f17559b6a400",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Controller",
+                    "action": "DodgeRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
