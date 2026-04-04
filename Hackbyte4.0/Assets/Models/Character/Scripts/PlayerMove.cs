@@ -1,25 +1,31 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(Animator))]
 public class PlayerMovement : MonoBehaviour
 {
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
     public float rotationSpeed = 10f;
+    public float gravity = -20f;
+    public Transform cameraTransform;
 
     private Animator animator;
-    private Rigidbody rb;
+    private CharacterController controller;
     private PlayerInput playerInput;
 
     private InputAction moveAction;
     private InputAction runAction;
 
     private Vector2 moveInput;
+    private float verticalVelocity;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody>();
+        controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
         moveAction = playerInput.actions["Move"];
@@ -35,12 +41,29 @@ public class PlayerMovement : MonoBehaviour
 
         if (move.magnitude > 0.1f)
         {
-            float currentSpeed = isRunning ? runSpeed : walkSpeed;
-            transform.Translate(move.normalized * currentSpeed * Time.deltaTime, Space.World);
+            if (cameraTransform != null)
+            {
+                move = Quaternion.Euler(0f, cameraTransform.eulerAngles.y, 0f) * move;
+            }
+
+            move.Normalize();
 
             Quaternion targetRotation = Quaternion.LookRotation(move);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
+
+        if (controller.isGrounded && verticalVelocity < 0f)
+        {
+            verticalVelocity = -2f;
+        }
+
+        verticalVelocity += gravity * Time.deltaTime;
+
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        Vector3 velocity = move.normalized * currentSpeed;
+        velocity.y = verticalVelocity;
+
+        controller.Move(velocity * Time.deltaTime);
 
         float animSpeed = 0f;
         if (moveInput.magnitude > 0.1f)
