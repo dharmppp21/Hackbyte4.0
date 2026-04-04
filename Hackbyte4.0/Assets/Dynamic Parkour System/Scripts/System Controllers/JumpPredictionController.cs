@@ -1,4 +1,4 @@
-/*
+﻿/*
 MIT License
 
 Copyright (c) 2023 Èric Canela
@@ -85,149 +85,147 @@ namespace Climbing
         /// </summary>
         public void CheckJump()
         {
-            // PERFORMANCE: Only do the expensive FindAheadPoints if the jump button is actually pressed this frame
-            // REMOVED limitMovement requirement to allow jumping in the middle of the map
-            if (hasArrived() && !controller.isJumping && controller.characterInput.jump && controller.characterInput.movement != Vector2.zero)
+            if (hasArrived() && !controller.isJumping && ((controller.isGrounded && curPoint == null) || curPoint != null) && controller.characterMovement.limitMovement)
             {
-                List<HandlePoints> points = new List<HandlePoints>();
-                controller.characterDetection.FindAheadPoints(ref points);
-                
-                // If FindAheadPoints returned immediately due to rate limiting, it might be empty
-                if (points.Count == 0) return;
-
-                float minRange = float.NegativeInfinity;
-                float minDist = float.PositiveInfinity;
-                Point p = null;
-                Point fp = curPoint;
-                newPoint = false;
-
-                //Gets direction relative to the input and the camera
-                Vector3 mov = new Vector3(controller.characterInput.movement.x, 0, controller.characterInput.movement.y);
-                Vector3 inputDir = controller.RotateToCameraDirection(mov) * Vector3.forward;
-
-                if (showDebug)
-                    Debug.DrawLine(transform.position, transform.position + inputDir);
-
-                //Get below point for reference as first point
-                if (fp == null)
+                if (controller.characterInput.jump && controller.characterInput.movement != Vector2.zero)
                 {
-                    RaycastHit hit;
-                    if (controller.characterDetection.ThrowRayOnDirection(transform.position, Vector3.down, 0.5f, out hit))
+                    List<HandlePoints> points = new List<HandlePoints>();
+                    controller.characterDetection.FindAheadPoints(ref points);
+
+                    float minRange = float.NegativeInfinity;
+                    float minDist = float.PositiveInfinity;
+                    Point p = null;
+                    Point fp = curPoint;
+                    newPoint = false;
+
+                    //Gets direction relative to the input and the camera
+                    Vector3 mov = new Vector3(controller.characterInput.movement.x, 0, controller.characterInput.movement.y);
+                    Vector3 inputDir = controller.RotateToCameraDirection(mov) * Vector3.forward;
+
+                    if (showDebug)
+                        Debug.DrawLine(transform.position, transform.position + inputDir);
+
+                    //Get below point for reference as first point
+                    if (fp == null)
                     {
-                        HandlePoints handle = hit.transform.GetComponentInChildren<HandlePoints>();
-                        if (handle)
+                        RaycastHit hit;
+                        if (controller.characterDetection.ThrowRayOnDirection(transform.position, Vector3.down, 0.5f, out hit))
                         {
-                            for (int i = 0; i < handle.pointsInOrder.Count; i++)
+                            HandlePoints handle = hit.transform.GetComponentInChildren<HandlePoints>();
+                            if (handle)
                             {
-                                if (handle.pointsInOrder[i] != null)
+                                for (int i = 0; i < handle.pointsInOrder.Count; i++)
                                 {
-                                    fp = handle.pointsInOrder[i];
-                                    break;
+                                    if (handle.pointsInOrder[i] != null)
+                                    {
+                                        fp = handle.pointsInOrder[i];
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                //Find Possible Landing Points relative to player direction Input
-                foreach (var item in points)
-                {
-                    if (item.pointType != PointType.Ledge)
+                    //Find Possible Landing Points relative to player direction Input
+                    foreach (var item in points)
                     {
-                        foreach (var point in item.pointsInOrder)
+                        if (item.pointType != PointType.Ledge)
                         {
-                            if (point == null || point.type == PointType.Ledge || curPoint == point)
-                                continue;
-
-                            Vector3 targetDirection = point.transform.position - transform.position;
-
-                            Vector3 d1 = new Vector3(targetDirection.x, 0, targetDirection.z);
-
-                            float dot = Vector3.Dot(d1.normalized, inputDir.normalized);
-
-                            if (fp == null)//First Point
+                            foreach (var point in item.pointsInOrder)
                             {
-                                fp = point;
+                                if (point == null || point.type == PointType.Ledge || curPoint == point)
+                                    continue;
+
+                                Vector3 targetDirection = point.transform.position - transform.position;
+
+                                Vector3 d1 = new Vector3(targetDirection.x, 0, targetDirection.z);
+
+                                float dot = Vector3.Dot(d1.normalized, inputDir.normalized);
+
+                                if (fp == null)//First Point
+                                {
+                                    fp = point;
+                                }
+
+                                if (fp.transform.parent == point.transform.parent)
+                                    continue;
+
+                                if (dot > 0.9 && targetDirection.sqrMagnitude < minDist && minRange - dot < 0.1f )
+                                {
+                                    p = point;
+                                    minRange = dot;
+                                    minDist = targetDirection.sqrMagnitude;
+                                    newPoint = true;
+                                }
+                            }
+                        }
+                    }
+
+                    bool target = false;
+
+                    //Creates a new Jump to Landing Point
+                    if (newPoint && p != null)
+                    {
+                        target = SetParabola(transform.position, p.transform.position);
+                        if (target)
+                        {
+                            curPoint = p;
+
+                            switch (curPoint.type)
+                            {
+                                case PointType.Pole:
+                                    controller.characterMovement.stopMotion = true;
+                                    controller.characterAnimation.JumpPrediction(true);
+                                    break;
+                                case PointType.Ground:
+                                    controller.characterMovement.stopMotion = false;
+                                    controller.characterAnimation.JumpPrediction(false);
+                                    break;
                             }
 
-                            if (fp.transform.parent == point.transform.parent)
-                                continue;
-
-                            if (dot > 0.9 && targetDirection.sqrMagnitude < minDist && minRange - dot < 0.1f )
-                            {
-                                p = point;
-                                minRange = dot;
-                                minDist = targetDirection.sqrMagnitude;
-                                newPoint = true;
-                            }
-                        }
-                    }
-                }
-
-                bool target = false;
-
-                //Creates a new Jump to Landing Point
-                if (newPoint && p != null)
-                {
-                    target = SetParabola(transform.position, p.transform.position);
-                    if (target)
-                    {
-                        curPoint = p;
-
-                        switch (curPoint.type)
-                        {
-                            case PointType.Pole:
-                                controller.characterMovement.stopMotion = true;
-                                controller.characterAnimation.JumpPrediction(true);
-                                break;
-                            case PointType.Ground:
-                                controller.characterMovement.stopMotion = false;
-                                controller.characterAnimation.JumpPrediction(false);
-                                break;
-                        }
-
-                        controller.DisableController();
-                        controller.isJumping = true;
-                        controller.characterAnimation.animator.SetBool("PredictedJump", true);
-                    }
-                }
-
-                //Creates a new Jump in case of not finding a Landing Point
-                if (!target)
-                {
-                    Vector3 end = transform.position + inputDir * 4;
-
-                    RaycastHit hit;
-                    if(controller.characterDetection.ThrowRayOnDirection(transform.position, inputDir, 4, out hit))
-                    {
-                        Vector3 temp = hit.point;
-                        temp.y = transform.position.y;
-                        Vector3 dist = temp - transform.position;
-
-                        if(dist.sqrMagnitude >= 2)
-                        {   
-                            end = hit.point + hit.normal * (controller.slidingCapsuleCollider.radius * 2);
-                        }
-                        else
-                        {
-                            end = Vector3.zero;
-                        }
-                    }
-
-                    if (end != Vector3.zero)
-                    {
-                        if(SetParabola(transform.position, end))
-                        {
-                            controller.characterAnimation.JumpPrediction(false);
-                            curPoint = null;
-                            controller.characterMovement.stopMotion = true;
                             controller.DisableController();
                             controller.isJumping = true;
+                            controller.characterAnimation.animator.SetBool("PredictedJump", true);
                         }
                     }
-                }
 
-                points.Clear();
+                    //Creates a new Jump in case of not finding a Landing Point
+                    if (!target)
+                    {
+                        Vector3 end = transform.position + inputDir * 4;
+
+                        RaycastHit hit;
+                        if(controller.characterDetection.ThrowRayOnDirection(transform.position, inputDir, 4, out hit))
+                        {
+                            Vector3 temp = hit.point;
+                            temp.y = transform.position.y;
+                            Vector3 dist = temp - transform.position;
+
+                            if(dist.sqrMagnitude >= 2)
+                            {   
+                                end = hit.point + hit.normal * (controller.slidingCapsuleCollider.radius * 2);
+                            }
+                            else
+                            {
+                                end = Vector3.zero;
+                            }
+                        }
+
+                        if (end != Vector3.zero)
+                        {
+                            if(SetParabola(transform.position, end))
+                            {
+                                controller.characterAnimation.JumpPrediction(false);
+                                curPoint = null;
+                                controller.characterMovement.stopMotion = true;
+                                controller.DisableController();
+                                controller.isJumping = true;
+                            }
+                        }
+                    }
+
+                    points.Clear();
+                }
             }
         }
 
@@ -237,27 +235,15 @@ namespace Climbing
         /// <returns></returns>
         public bool isMidPoint()
         {
-            if (curPoint == null || (controller.characterInput.drop && controller.isGrounded)) //Player is Droping or finished jump to ground
+            if (curPoint == null || controller.characterInput.drop) //Player is Droping
             {
                 curPoint = null;
                 controller.EnableController();
-                return false;
-            }
-            else if (controller.characterInput.drop && !controller.isGrounded) // Dropping from a pole
-            {
-                curPoint = null;
-                controller.EnableController();
-                controller.isJumping = true; // Still "jumping" (falling)
-                return false;
             }
             else if (curPoint)
             {
                 if (curPoint.type == PointType.Pole)
                 {
-                    // Ensure we stay exactly at the pole's position
-                    controller.characterMovement.rb.position = curPoint.transform.position;
-                    controller.characterMovement.SetKinematic(true);
-
                     Vector3 direction = new Vector3(controller.characterInput.movement.x, 0f, controller.characterInput.movement.y).normalized;
                     if (direction != Vector3.zero)
                         controller.RotatePlayer(direction);
@@ -268,7 +254,7 @@ namespace Climbing
                     if (curPoint && !controller.isJumping)
                     {
                         //Delay between allowing new jump
-                        if (delay < 0.4f)
+                        if (delay < 0.1f)
                             delay += Time.deltaTime;
                         else
                             CheckJump();
@@ -319,7 +305,7 @@ namespace Climbing
                 delay = 0;
                 move = false;
             }
-            else if (actualSpeed >= 0.95f && curPoint == null) // Increased from 0.7f to 0.95f to avoid falling short
+            else if (actualSpeed >= 0.7f && curPoint == null) //
             {
                 controller.EnableController();
                 actualSpeed = 0.0f;

@@ -1392,7 +1392,6 @@ MonoBehaviour:
   stepVelocity: 0.08
   normalCapsuleCollider: {fileID: 5556358534646836576}
   slidingCapsuleCollider: {fileID: 6941776532399528574}
-  flipMovement: 0
 --- !u!114 &5556358534646836588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1454,13 +1453,10 @@ MonoBehaviour:
   showDebug: 0
   ledgeLayer:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   climbLayer:
     serializedVersion: 2
     m_Bits: 1
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 0
   OriginLedgeRay: {x: 0, y: 1.57, z: 0.1}
   OriginFeetRay: {x: 0.3, y: -1, z: -0.3}
   LedgeRayLength: 1.5

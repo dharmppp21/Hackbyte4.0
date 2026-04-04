@@ -157,20 +157,16 @@ namespace Climbing
 
                 //Detect Player on Irregular Surface and adjust movement to avoid slowing down and undesired jumps
                 RaycastHit hit;
-                if (controller.characterDetection.ThrowRayOnDirection(transform.position + Vector3.up * 0.1f, Vector3.down, 1.1f, out hit, controller.characterDetection.groundLayer))
+                controller.characterDetection.ThrowRayOnDirection(transform.position, Vector3.down, 1.0f, out hit);
+                if (hit.normal != Vector3.up)
                 {
-                    float angle = Vector3.Angle(hit.normal, Vector3.up);
-                    if (angle > 25f) // Increased threshold from 1f to 25f to allow walking on slight inclines
-                    {
-                        controller.inSlope = true;
-                        // Use a softer push away from slope to avoid "jittery" movement - FIXED: Added Time.fixedDeltaTime
-                        rb.linearVelocity += -new Vector3(hit.normal.x, 0, hit.normal.z) * 5.0f * Time.fixedDeltaTime; 
-                        rb.linearVelocity = rb.linearVelocity + Vector3.up * Physics.gravity.y * 1.2f * Time.fixedDeltaTime;
-                    }
-                    else
-                    {
-                        controller.inSlope = false;
-                    }
+                    controller.inSlope = true;
+                    rb.linearVelocity += -new Vector3(hit.normal.x, 0, hit.normal.z) * 1.0f;
+                    rb.linearVelocity = rb.linearVelocity + Vector3.up * Physics.gravity.y * 1.6f * Time.fixedDeltaTime;
+                }
+                else
+                {
+                    controller.inSlope = false;
                 }
 
                 //If player fins Small Obstacle Auto Steps it without affecting the movement

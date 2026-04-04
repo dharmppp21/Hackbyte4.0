@@ -1,4 +1,4 @@
-/*
+﻿/*
 MIT License
 
 Copyright (c) 2023 Èric Canela
@@ -38,7 +38,6 @@ namespace Climbing
         [Header("Layers")]
         public LayerMask ledgeLayer;
         public LayerMask climbLayer;
-        public LayerMask groundLayer; // Added for optimization
 
         [Header("Rays")]
         [SerializeField] private Vector3 OriginLedgeRay;
@@ -51,16 +50,17 @@ namespace Climbing
         private void Start()
         {
             // --- LOCAL MULTIPLAYER FAILSAFE ---
+            // If layers are not set in the inspector (bits == 0), auto-assign them
             if (ledgeLayer.value == 0)
+            {
                 ledgeLayer = 1 << LayerMask.NameToLayer("Ledge");
-            
+                Debug.Log($"[Multiplayer Failsafe] Ledge Layer auto-assigned to {ledgeLayer.value}");
+            }
             if (climbLayer.value == 0)
+            {
                 climbLayer = 1 << LayerMask.NameToLayer("Wall");
-
-            if (groundLayer.value == 0)
-                groundLayer = (1 << LayerMask.NameToLayer("Default")) | (1 << LayerMask.NameToLayer("Ground"));
-            
-            Debug.Log($"[Optimization] Physics Layers initialized. Ground: {groundLayer.value}");
+                Debug.Log($"[Multiplayer Failsafe] Climb/Wall Layer auto-assigned to {climbLayer.value}");
+            }
         }
 
         public bool FindLedgeCollision(out RaycastHit hit)
@@ -86,6 +86,8 @@ namespace Climbing
             for (int i = 0; i < DropLedgeNumRays; i++)
             {
                 Vector3 origin = transform.position + transform.forward * 0.8f - new Vector3(0, i * 0.15f, 0);
+
+                Debug.DrawLine(origin, transform.position - new Vector3(0, i * 0.15f, 0));
 
                 if(Physics.Raycast(origin, -transform.forward, out hit, 0.8f, ledgeLayer))
                 {
@@ -139,10 +141,6 @@ namespace Climbing
                 {
                     Debug.DrawLine(hit.point, hit.point + hit.normal, Color.cyan);
                 }
-
-                // --- VALIDATION: Ensure the ledge has HandlePoints ---
-                if (hit.transform.GetComponentInChildren<HandlePoints>() == null)
-                    return false;
 
                 // If it's a pole, we are more lenient with the normal check
                 if (hit.transform.CompareTag("Pole"))
@@ -220,7 +218,7 @@ namespace Climbing
                 Debug.DrawLine(origin, origin + direction * length, Color.green);
             }
 
-            return Physics.Raycast(origin, direction, out hit, length, groundLayer); // Use groundLayer by default
+            return Physics.Raycast(origin, direction, out hit, length);
         }
 
         public bool ThrowRayOnDirection(Vector3 origin, Vector3 direction, float length)
@@ -230,42 +228,29 @@ namespace Climbing
                 Debug.DrawLine(origin, origin + direction * length, Color.green);
             }
 
-            return Physics.Raycast(origin, direction, length, groundLayer); // Use groundLayer by default
+            return Physics.Raycast(origin, direction, length);
         }
 
         public bool IsGrounded(float stepHeight) {
+            if (showDebug)
+            {
+                Debug.DrawLine(transform.position + new Vector3(0, 0.5f, 0), transform.position + new Vector3(0, 0.5f, 0) + Vector3.down * 0.8f, Color.green);
+            }
             RaycastHit hit;
-            // ROBUST: SphereCast is more reliable on complex geometry like LEVEL2PTR
-            // It prevents the character from falling through or jittering on edges
-            return Physics.SphereCast(transform.position + new Vector3(0, 0.5f, 0), 0.25f, Vector3.down, out hit, 0.45f, groundLayer);
+            return Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hit, 0.7f);//0.2f
         }
-
-        private Collider[] overlapResults = new Collider[10]; // Reduced size for performance
-        private float lastFindTime = 0f;
-        private const float FIND_INTERVAL = 0.1f; // Only search 10 times per second instead of every frame
 
         public void FindAheadPoints(ref List<HandlePoints> list)
         {
-            // RATE LIMITING: Don't search every frame
-            if (Time.time < lastFindTime + FIND_INTERVAL) return;
-            lastFindTime = Time.time;
+            Collider[] cols = Physics.OverlapSphere(transform.position, 5);
 
-            // OPTIMIZED: Using LayerMask to ignore character and non-interactable objects
-            int count = Physics.OverlapSphereNonAlloc(transform.position, 5, overlapResults, ledgeLayer | climbLayer);
-
-            for (int i = 0; i < count; i++)
+            foreach (var item in cols)
             {
-                if (overlapResults[i] == null) continue;
-                
-                // Only check for tags before doing expensive components search
-                if (overlapResults[i].CompareTag("Pole") || overlapResults[i].CompareTag("Ledge"))
+                if (Vector3.Dot(item.transform.position, transform.position) > 0)
                 {
-                    Vector3 toItem = overlapResults[i].transform.position - transform.position;
-                    if (Vector3.Dot(toItem.normalized, transform.forward) > 0)
-                    {
-                        HandlePoints handle = overlapResults[i].GetComponentInChildren<HandlePoints>();
-                        if (handle) list.Add(handle);
-                    }
+                    HandlePoints handle = item.GetComponentInChildren<HandlePoints>();
+                    if (handle)
+                        list.Add(handle);
                 }
             }
         }

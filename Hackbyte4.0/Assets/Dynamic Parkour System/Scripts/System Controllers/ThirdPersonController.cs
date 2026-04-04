@@ -128,18 +128,12 @@ namespace Climbing
 
         private bool OnGround()
         {
-            // Using a slightly larger buffer for grounding to avoid "flickering" isGrounded state
-            return characterDetection.IsGrounded(stepHeight + 0.2f);
+            return characterDetection.IsGrounded(stepHeight);
         }
-
-        [Header("Movement Options")]
-        public bool flipMovement = false;
 
         public void AddMovementInput(Vector2 direction)
         {
             Vector3 translation = Vector3.zero;
-
-            if (flipMovement) direction = -direction;
 
             translation = GroundMovement(direction);
 
