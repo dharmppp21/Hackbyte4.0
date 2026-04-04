@@ -140,6 +140,10 @@ namespace Climbing
                     Debug.DrawLine(hit.point, hit.point + hit.normal, Color.cyan);
                 }
 
+                // --- VALIDATION: Ensure the ledge has HandlePoints ---
+                if (hit.transform.GetComponentInChildren<HandlePoints>() == null)
+                    return false;
+
                 // If it's a pole, we are more lenient with the normal check
                 if (hit.transform.CompareTag("Pole"))
                     return true;
@@ -231,9 +235,9 @@ namespace Climbing
 
         public bool IsGrounded(float stepHeight) {
             RaycastHit hit;
-            // PERFORMANCE: Raycast is faster than SphereCast on complex maps
-            // Using a slightly thicker ray logic by checking center
-            return Physics.Raycast(transform.position + new Vector3(0, 0.3f, 0), Vector3.down, out hit, 0.5f, groundLayer);
+            // ROBUST: SphereCast is more reliable on complex geometry like LEVEL2PTR
+            // It prevents the character from falling through or jittering on edges
+            return Physics.SphereCast(transform.position + new Vector3(0, 0.5f, 0), 0.25f, Vector3.down, out hit, 0.45f, groundLayer);
         }
 
         private Collider[] overlapResults = new Collider[10]; // Reduced size for performance

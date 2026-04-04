@@ -76,7 +76,7 @@ namespace Climbing
                 Action actionInfo = Resources.Load<Action>("ActionsConfig/VaultSlide");
                 Add(new VaultSlide(controller, actionInfo));
             }
-            if (vaultActions.HasFlag(VaultActions.Slide))
+            if (vaultActions.HasFlag(VaultActions.Reach))
             {
                 Action actionInfo = Resources.Load<Action>("ActionsConfig/VaultReach");
                 Add(new VaultReach(controller, actionInfo));
@@ -95,6 +95,9 @@ namespace Climbing
             }
         }
 
+        private float lastCheckTime = 0f;
+        private const float CHECK_INTERVAL = 0.05f; // Check 20 times per second
+
         void Update()
         {
             if (!controller.isVaulting)
@@ -102,14 +105,19 @@ namespace Climbing
                 curAction = null;
             }
 
-            //Check if vaulting action can be performed
-            foreach (var item in actions)
+            // PERFORMANCE: Only check for new vaulting actions at intervals
+            if (!controller.isVaulting && Time.time > lastCheckTime + CHECK_INTERVAL)
             {
-                if (item.CheckAction())
+                lastCheckTime = Time.time;
+                //Check if vaulting action can be performed
+                foreach (var item in actions)
                 {
-                    curAction = item;
-                    controller.isVaulting = true;
-                    break;
+                    if (item.CheckAction())
+                    {
+                        curAction = item;
+                        controller.isVaulting = true;
+                        break;
+                    }
                 }
             }
 

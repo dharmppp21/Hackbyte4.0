@@ -48,7 +48,7 @@ namespace Climbing
                 Vector3 origin = controller.transform.position + kneeRaycastOrigin;
 
                 //Finds Obstacle
-                if (controller.characterDetection.ThrowRayOnDirection(origin, controller.transform.forward, kneeRaycastLength, out hit))
+                if (controller.characterDetection.ThrowRayOnDirection(origin, controller.transform.forward, kneeRaycastLength, out hit, controller.characterDetection.climbLayer))
                 {
                     Vector3 origin2 = origin + (-hit.normal * (hit.transform.localScale.z + landOffset));
 
@@ -62,7 +62,7 @@ namespace Climbing
 
                     RaycastHit hit2;
                     //Get ending position
-                    if (controller.characterDetection.ThrowRayOnDirection(origin2, Vector3.down, 10, out hit2)) //Ground Hit
+                    if (controller.characterDetection.ThrowRayOnDirection(origin2, Vector3.down, 10, out hit2, controller.characterDetection.groundLayer)) //Ground Hit
                     {
                         if (hit2.collider)
                         {

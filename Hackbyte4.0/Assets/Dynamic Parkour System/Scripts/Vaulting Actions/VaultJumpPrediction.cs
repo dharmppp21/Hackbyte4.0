@@ -44,10 +44,24 @@ namespace Climbing
             if (controller.isVaulting)
                 return false;
 
-            //Ensures that curPoint is Pole type
+            //Ensures that curPoint is Pole type - MORE ROBUST CHECK
             if (jumpController.curPoint != null)
             {
-                if (jumpController.curPoint.transform.parent.parent.tag != "Pole")
+                // Check point type directly or check tag on any parent
+                bool isPole = jumpController.curPoint.type == PointType.Pole;
+                
+                if (!isPole)
+                {
+                    // Fallback to tag check on parents
+                    Transform p = jumpController.curPoint.transform.parent;
+                    while (p != null)
+                    {
+                        if (p.CompareTag("Pole")) { isPole = true; break; }
+                        p = p.parent;
+                    }
+                }
+
+                if (!isPole)
                     jumpController.curPoint = null;
             }
 
@@ -64,7 +78,8 @@ namespace Climbing
             {
                 jumpController.hasEndedJump();
 
-                jumpController.FollowParabola(0.7f);
+                // Using a more dynamic length or trusting the JumpPredictionController's internal timing
+                jumpController.FollowParabola(0.8f); 
                 ret = true;
             }
             else

@@ -187,6 +187,13 @@ namespace Climbing
                     {
                         //Find Target Point
                         target = ReachLedge(hit);
+
+                        if (target == Vector3.zero)
+                        {
+                            ledgeFound = false;
+                            return false;
+                        }
+
                         targetRot = Quaternion.LookRotation(-hit.normal);
 
                         //Check if Ledge is a Braced or FreeHand Point
@@ -219,6 +226,12 @@ namespace Climbing
                     {
                         //Find Target Point
                         target = ReachLedge(hit);
+
+                        if (target == Vector3.zero)
+                        {
+                            return false;
+                        }
+
                         targetRot = Quaternion.LookRotation(-hit.normal); 
                         transform.rotation = Quaternion.FromToRotation(transform.forward, hit.normal) * transform.rotation;//rotates towards ledge direction
 
@@ -777,9 +790,24 @@ namespace Climbing
         {
             Vector3 targetPos = Vector3.zero;
 
+            if (hit.transform == null)
+                return Vector3.zero;
+
             curLedge = hit.transform.gameObject;
             HandlePoints handle = curLedge.GetComponentInChildren<HandlePoints>();
+            
+            if (handle == null)
+            {
+                if (debug) Debug.LogWarning($"[ClimbController] Ledge {curLedge.name} has no HandlePoints component!");
+                return Vector3.zero;
+            }
+
             List<Point> points = handle.pointsInOrder;
+            if (points == null || points.Count == 0)
+            {
+                if (debug) Debug.LogWarning($"[ClimbController] Ledge {curLedge.name} has no points initialized!");
+                return Vector3.zero;
+            }
 
             float dist = float.PositiveInfinity;
             for (int i = 0; i < points.Count; i++)
@@ -798,7 +826,13 @@ namespace Climbing
                     //Right Point Offset to place the player on Ledge
                     if (handle.furthestRight == points[i])
                     {
-                        targetPos -= hit.transform.right * 0.5f;
+                        targetPos += points[i].transform.right * 0.15f;
+                    }
+
+                    //Left Point Offset to place the player on Ledge
+                    if (handle.furthestLeft == points[i])
+                    {
+                        targetPos -= points[i].transform.right * 0.15f;
                     }
                 }
             }

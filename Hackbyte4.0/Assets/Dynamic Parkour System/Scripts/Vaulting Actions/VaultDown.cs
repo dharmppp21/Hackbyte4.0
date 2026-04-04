@@ -53,8 +53,8 @@ namespace Climbing
                         Vector3 origin2 = controller.transform.position + Vector3.up * 0.1f;
 
                         RaycastHit hit;
-                        if (!controller.characterDetection.ThrowRayOnDirection(origin, Vector3.down, 1.5f, out hit) ||
-                             controller.characterDetection.ThrowRayOnDirection(origin2, controller.transform.forward, 1.0f, out hit))
+                        if (!controller.characterDetection.ThrowRayOnDirection(origin, Vector3.down, 1.5f, out hit, controller.characterDetection.groundLayer) ||
+                             controller.characterDetection.ThrowRayOnDirection(origin2, controller.transform.forward, 1.0f, out hit, controller.characterDetection.climbLayer))
                         {
                             timeDrop = 0;
                         }

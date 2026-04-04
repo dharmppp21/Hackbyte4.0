@@ -54,7 +54,7 @@ namespace Climbing
                 Vector3 origin = controller.transform.position + kneeRaycastOrigin;
 
                 //Checks if Vault obstacle in front
-                if (controller.characterDetection.ThrowRayOnDirection(origin, controller.transform.forward, kneeRaycastLength, out hit))
+                if (controller.characterDetection.ThrowRayOnDirection(origin, controller.transform.forward, kneeRaycastLength, out hit, controller.characterDetection.climbLayer))
                 {
                     // If direction not the same as object don't do anything
                     // or angle of movement not valid
@@ -69,7 +69,7 @@ namespace Climbing
 
                     RaycastHit hit2;
                     //Get landing position
-                    if (controller.characterDetection.ThrowRayOnDirection(origin2, Vector3.down, 10, out hit2))
+                    if (controller.characterDetection.ThrowRayOnDirection(origin2, Vector3.down, 10, out hit2, controller.characterDetection.groundLayer))
                     {
                         if (hit2.collider)
                         {

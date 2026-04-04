@@ -46,17 +46,41 @@ namespace Climbing
             if (moveAction == null) Debug.LogError($"[Input Error] Cannot find action named '{moveActionName}'. Make sure it exists in your Input Action Asset.");
         }
 
+        private void OnEnable()
+        {
+            if (moveAction != null) moveAction.Enable();
+            if (jumpAction != null)
+            {
+                jumpAction.Enable();
+                jumpAction.performed += ctx => jump = true;
+                jumpAction.canceled += ctx => jump = false;
+            }
+            if (dropAction != null)
+            {
+                dropAction.Enable();
+                dropAction.performed += ctx => drop = true;
+                dropAction.canceled += ctx => drop = false;
+            }
+            if (runAction != null)
+            {
+                runAction.Enable();
+                runAction.performed += ctx => run = true;
+                runAction.canceled += ctx => run = false;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (moveAction != null) moveAction.Disable();
+            if (jumpAction != null) jumpAction.Disable();
+            if (dropAction != null) dropAction.Disable();
+            if (runAction != null) runAction.Disable();
+        }
+
         private void Update()
         {
-            // Failsafe: Stop reading if movement isn't hooked up properly
-            if (moveAction == null) return;
-
-            movement = moveAction.ReadValue<Vector2>();
-
-            // The "?." means "If this action exists, check if it's pressed. If not, return false."
-            jump = jumpAction?.IsPressed() ?? false;
-            drop = dropAction?.IsPressed() ?? false;
-            run = runAction?.IsPressed() ?? false;
+            if (moveAction != null)
+                movement = moveAction.ReadValue<Vector2>();
         }
 
         // The Parkour System requires this method to exist
