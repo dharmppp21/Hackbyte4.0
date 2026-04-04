@@ -3,10 +3,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
     public float rotationSpeed = 10f;
-    public float jumpForce = 6f;
 
     private Animator animator;
     private Rigidbody rb;
@@ -14,10 +14,8 @@ public class PlayerMovement : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction runAction;
-    private InputAction jumpAction;
 
     private Vector2 moveInput;
-    private bool isGrounded = true;
 
     void Awake()
     {
@@ -27,7 +25,6 @@ public class PlayerMovement : MonoBehaviour
 
         moveAction = playerInput.actions["Move"];
         runAction = playerInput.actions["Run"];
-        jumpAction = playerInput.actions["Jump"];
     }
 
     void Update()
@@ -50,24 +47,7 @@ public class PlayerMovement : MonoBehaviour
         if (moveInput.magnitude > 0.1f)
             animSpeed = isRunning ? 1f : 0.5f;
 
-        animator.SetFloat("Speed", animSpeed, 0.1f, Time.deltaTime);
-        animator.SetBool("IsGrounded", isGrounded);
-
-        if (jumpAction.triggered && isGrounded)
-        {
-            isGrounded = false;
-            animator.SetBool("IsGrounded", false);
-            animator.SetTrigger("Jump");
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-            animator.SetBool("IsGrounded", true);
-        }
+        if (animator != null)
+            animator.SetFloat("Speed", animSpeed, 0.1f, Time.deltaTime);
     }
 }
