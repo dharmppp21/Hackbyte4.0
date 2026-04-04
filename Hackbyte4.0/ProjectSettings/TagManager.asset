@@ -10,6 +10,7 @@ TagManager:
   - Slide
   - Deep Jump
   - Ground
+  - Box
   layers:
   - Default
   - TransparentFX

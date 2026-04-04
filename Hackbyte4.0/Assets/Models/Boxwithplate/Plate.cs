@@ -7,19 +7,23 @@ public class Plate : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+    
+
+        if (other.CompareTag("Box"))
         {
-            doorAnimator1.SetBool("POpen", true);
-            doorAnimator2.SetBool("POpen", true);
+            doorAnimator1.SetBool("Open", true);
+            doorAnimator2.SetBool("Open2", true);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        
+
+        if (other.CompareTag("Box"))
         {
-            doorAnimator1.SetBool("POpen", false);
-            doorAnimator2.SetBool("POpen", false);
+            doorAnimator1.SetBool("Open", false);
+            doorAnimator2.SetBool("Open2", false);
         }
     }
 }
