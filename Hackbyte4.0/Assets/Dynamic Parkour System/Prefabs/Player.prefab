@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5556358532925082188}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.037649285, y: -0.0641554, z: 0.0042533125, w: 0.9972204}
+  m_LocalRotation: {x: -0.03764932, y: -0.06415531, z: 0.0042533046, w: 0.9972204}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -108,7 +108,7 @@ Transform:
   m_GameObject: {fileID: 5556358532959275495}
   serializedVersion: 2
   m_LocalRotation: {x: 0.026928298, y: 0.0021012195, z: -0.000056602916, w: 0.9996352}
-  m_LocalPosition: {x: 0.010622263, y: 1.6300889, z: -1.6849713}
+  m_LocalPosition: {x: 0, y: 1.88649, z: -4.21167}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -246,7 +246,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5556358533096778056}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.019552061, y: -0.064067684, z: 0.005416485, w: 0.9977393}
+  m_LocalRotation: {x: -0.019552091, y: -0.064067595, z: 0.0054164757, w: 0.9977393}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -360,7 +360,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5556358533144897770}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0014004563, y: -0.06395856, z: 0.006580948, w: 0.99792993}
+  m_LocalRotation: {x: -0.0014004897, y: -0.06395847, z: 0.0065809367, w: 0.99792993}
   m_LocalPosition: {x: -5.3290705e-15, y: 0.0000056911667, z: -0.000000593659}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1211,7 +1211,6 @@ GameObject:
   - component: {fileID: 5556358534646836591}
   - component: {fileID: 5556358534646836577}
   - component: {fileID: 5556358534646836576}
-  - component: {fileID: 6941776532399528574}
   - component: {fileID: 7974667347261648450}
   - component: {fileID: 5556358534646836590}
   - component: {fileID: 5556358534646836588}
@@ -1318,29 +1317,6 @@ CapsuleCollider:
   m_Height: 1.7326691
   m_Direction: 1
   m_Center: {x: 0, y: 0.86576736, z: 0}
---- !u!136 &6941776532399528574
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5556358534646836578}
-  m_Material: {fileID: 13400000, guid: 2fb463ad16b5f4f4dbfb8539be2be4dd, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.34
-  m_Height: 1.39
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.86576736, z: 0}
 --- !u!114 &7974667347261648450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1391,7 +1367,7 @@ MonoBehaviour:
   stepHeight: 0.6
   stepVelocity: 0.08
   normalCapsuleCollider: {fileID: 5556358534646836576}
-  slidingCapsuleCollider: {fileID: 6941776532399528574}
+  slidingCapsuleCollider: {fileID: 0}
 --- !u!114 &5556358534646836588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1562,8 +1538,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: KeyboardLeft
+  m_NeverAutoSwitchControlSchemes: 1
+  m_DefaultControlScheme: 
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
