@@ -190,7 +190,7 @@ namespace Climbing
 
         public void SetMatchTarget(AvatarTarget avatarTarget, Vector3 targetPos, Quaternion targetRot, Vector3 offset, float startnormalizedTime, float targetNormalizedTime)
         {
-            if (animator.isMatchingTarget)
+            if (animator.isMatchingTarget || animator.IsInTransition(0))
                 return;
 
             float normalizeTime = Mathf.Repeat(animState.normalizedTime, 1f);

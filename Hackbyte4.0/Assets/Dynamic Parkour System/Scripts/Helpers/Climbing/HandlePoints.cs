@@ -59,6 +59,10 @@ namespace Climbing
 
         void Update()
         {
+            // Optimization: Only run update logic if one of the flags is set
+            // In Play Mode, we don't usually need to regenerate points every frame.
+            if (!createIndicators && !updatePoints && !deleteAll) return;
+
             if (createIndicators)
             {
                 createIndicators = false;
@@ -156,6 +160,7 @@ namespace Climbing
                 DestroyImmediate(ps[i].transform.gameObject);
             }
 
+            if (pointsInOrder == null) pointsInOrder = new List<Point>();
             pointsInOrder.Clear();
         }
 
