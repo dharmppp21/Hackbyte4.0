@@ -8,7 +8,7 @@ public class PressurePlateDoor : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            doorAnimator.SetBool("Open", true);
+            doorAnimator.SetBool("POpen", true);
         }
     }
 
@@ -16,7 +16,7 @@ public class PressurePlateDoor : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            doorAnimator.SetBool("Open", false);
+            doorAnimator.SetBool("POpen", false);
         }
     }
 }
