@@ -9,6 +9,12 @@ public class PlayerCameraSetup : MonoBehaviour
     public CinemachineFreeLook freeLookCamera;
     public Camera playerCamera;
 
+    [Header("Sensitivity")]
+    public float mouseSensitivityX = 15f;
+    public float mouseSensitivityY = 0.1f;
+    public float gamepadSensitivityX = 300f;
+    public float gamepadSensitivityY = 2f;
+
     private PlayerInput playerInput;
     private InputAction lookAction;
     private bool initialized = false;
@@ -18,76 +24,88 @@ public class PlayerCameraSetup : MonoBehaviour
         if (initialized) return;
         
         playerInput = GetComponent<PlayerInput>();
-        lookAction = playerInput.actions["Look"];
+        if (playerInput == null) return;
 
-        // 1. Find or Setup the Rendering Camera
-        if (playerCamera == null)
+        // Ensure actions are ready
+        if (playerInput.actions == null)
         {
-            // Look for a camera already in children (common in Cinemachine setups)
-            playerCamera = GetComponentInChildren<Camera>();
+            Debug.LogError($"[PlayerCameraSetup] PlayerInput on {gameObject.name} has no Input Action Asset!");
+            return;
         }
 
-        if (playerCamera == null)
+        lookAction = playerInput.actions.FindAction("Look");
+        if (lookAction == null)
         {
-            // If still no camera, create a new one
-            GameObject camObj = new GameObject("PlayerCamera_" + playerIndex);
-            camObj.transform.SetParent(transform);
-            camObj.transform.localPosition = new Vector3(0, 2, -5);
-            playerCamera = camObj.AddComponent<Camera>();
-            camObj.AddComponent<AudioListener>();
+            Debug.LogWarning($"[PlayerCameraSetup] 'Look' action not found for Player {playerIndex}");
         }
 
-        // 2. Setup Cinemachine Brain
-        var brain = playerCamera.GetComponent<CinemachineBrain>();
-        if (brain == null) brain = playerCamera.gameObject.AddComponent<CinemachineBrain>();
+        // 1. Setup Layers for Culling
+        int playerLayer = (playerIndex == 0) ? 6 : 7;
+        int otherPlayerLayer = (playerIndex == 0) ? 7 : 6;
+        
+        SetLayerRecursively(gameObject, playerLayer);
 
-        // 3. Find or Setup the FreeLook Virtual Camera
-        if (freeLookCamera == null)
+        // 2. Setup the Rendering Camera
+        if (playerCamera == null) playerCamera = GetComponentInChildren<Camera>();
+        
+        if (playerCamera != null)
         {
-            freeLookCamera = GetComponentInChildren<CinemachineFreeLook>();
+            playerCamera.enabled = true;
+            
+            // Culling Mask: Hide other player
+            playerCamera.cullingMask &= ~(1 << otherPlayerLayer);
+            playerCamera.cullingMask |= (1 << playerLayer);
+
+            // Set Split Screen Viewport (Vertical: Left/Right)
+            if (playerIndex == 0)
+            {
+                playerCamera.rect = new Rect(0, 0, 0.5f, 1);
+                playerCamera.depth = 10;
+            }
+            else
+            {
+                playerCamera.rect = new Rect(0.5f, 0, 0.5f, 1);
+                playerCamera.depth = 11;
+                
+                var al = playerCamera.GetComponent<AudioListener>();
+                if (al != null) al.enabled = false;
+            }
+
+            var brain = playerCamera.GetComponent<CinemachineBrain>();
+            if (brain == null) brain = playerCamera.gameObject.AddComponent<CinemachineBrain>();
         }
+
+        // 3. Setup the FreeLook Virtual Camera
+        if (freeLookCamera == null) freeLookCamera = GetComponentInChildren<CinemachineFreeLook>();
 
         if (freeLookCamera != null)
         {
-            freeLookCamera.Follow = transform;
-            freeLookCamera.LookAt = transform;
-
-            // Important: Each player's Brain should only react to their own Virtual Camera
-            // Usually Cinemachine handles this via layers or priorities, but for split screen,
-            // having the Virtual Camera as a child of the player and the Brain on the player's camera is best.
-            
-            // Disable default input
+            freeLookCamera.Follow = this.transform;
+            freeLookCamera.LookAt = this.transform;
             freeLookCamera.m_XAxis.m_InputAxisName = "";
             freeLookCamera.m_YAxis.m_InputAxisName = "";
+            freeLookCamera.gameObject.layer = playerLayer;
         }
 
-        // 4. CONFIGURE SPLIT SCREEN VIEWPORT (Vertical: Left/Right)
-        if (playerIndex == 0)
-        {
-            playerCamera.rect = new Rect(0, 0, 0.5f, 1); // LEFT side
-        }
-        else
-        {
-            playerCamera.rect = new Rect(0.5f, 0, 0.5f, 1); // RIGHT side
-            
-            // Disable redundant AudioListeners
-            var audioListener = playerCamera.GetComponent<AudioListener>();
-            if (audioListener != null) audioListener.enabled = false;
-        }
-
-        playerCamera.depth = playerIndex + 1; // Ensure cameras are rendered above existing ones
         initialized = true;
+        Debug.Log($"[PlayerCameraSetup] Player {playerIndex} initialized.");
+    }
 
-        Debug.Log($"PlayerCameraSetup: Player {playerIndex} camera initialized on {playerCamera.name}");
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj.GetComponent<Camera>() != null) return;
+        
+        obj.layer = newLayer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
     }
 
     void Start()
     {
-        // Fallback auto-init if not called by Manager
         if (!initialized && GetComponent<PlayerInput>() != null)
-        {
             Initialize(GetComponent<PlayerInput>().playerIndex);
-        }
     }
 
     void Update()
@@ -96,11 +114,12 @@ public class PlayerCameraSetup : MonoBehaviour
         {
             Vector2 input = lookAction.ReadValue<Vector2>();
             
-            float sensitivityX = (playerInput.currentControlScheme == "Gamepad") ? 300f : 1f;
-            float sensitivityY = (playerInput.currentControlScheme == "Gamepad") ? 5f : 0.02f;
+            bool isGamepad = playerInput.currentControlScheme == "Gamepad";
+            float xSens = isGamepad ? gamepadSensitivityX : mouseSensitivityX;
+            float ySens = isGamepad ? gamepadSensitivityY : mouseSensitivityY;
 
-            freeLookCamera.m_XAxis.m_InputAxisValue = input.x * sensitivityX * Time.deltaTime;
-            freeLookCamera.m_YAxis.m_InputAxisValue = input.y * sensitivityY * Time.deltaTime;
+            freeLookCamera.m_XAxis.m_InputAxisValue = input.x * xSens;
+            freeLookCamera.m_YAxis.m_InputAxisValue = input.y * ySens;
         }
     }
 }

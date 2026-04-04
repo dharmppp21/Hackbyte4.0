@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Users;
 
 public class LocalMultiplayerManager : MonoBehaviour
 {
@@ -15,53 +16,61 @@ public class LocalMultiplayerManager : MonoBehaviour
 
     void Awake()
     {
-        // Disable PlayerInputManager if it's on the same object or in the scene
-        // because we are manually joining players to avoid double-spawning.
         var pim = FindObjectOfType<PlayerInputManager>();
-        if (pim != null)
-        {
-            pim.enabled = false;
-            Debug.Log("LocalMultiplayerManager: Disabled PlayerInputManager to prevent double-spawning.");
-        }
+        if (pim != null) pim.enabled = false;
     }
 
     void Start()
     {
-        // Hide/Disable the Main Camera so only split-screen cameras show
         GameObject mainCam = GameObject.FindWithTag("MainCamera");
         if (mainCam != null)
         {
             Camera cam = mainCam.GetComponent<Camera>();
             if (cam != null) cam.enabled = false;
-            
-            // Also disable AudioListener to avoid dual listener warnings
             AudioListener listener = mainCam.GetComponent<AudioListener>();
             if (listener != null) listener.enabled = false;
-            
-            Debug.Log("LocalMultiplayerManager: Main Camera disabled.");
         }
+
+        if (playerPrefab == null) Debug.LogError("[LocalMultiplayerManager] Player Prefab is MISSING in inspector!");
+        if (player1Spawn == null) Debug.LogError("[LocalMultiplayerManager] Player 1 Spawn is MISSING in inspector!");
     }
 
     void Update()
     {
-        // 1. Join Player 1 (KeyboardLeft) with Space
-        if (!player1Joined && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+        // Debug periodic check
+        if (Time.frameCount % 300 == 0) // Log every ~5 seconds
         {
-            JoinPlayer(0, "KeyboardLeft", Keyboard.current, player1Spawn.position);
-            player1Joined = true;
+            if (!player1Joined) Debug.Log($"[Manager] Waiting for Player 1 (Space). Keyboard detected: {Keyboard.current != null}");
+            if (!player2Joined) Debug.Log($"[Manager] Waiting for Player 2 (Gamepad A). Gamepad detected: {Gamepad.current != null}");
         }
 
-        // 2. Join Player 2 (Gamepad) with Gamepad A/South button
+        // Join Player 1: Keyboard (Space)
+        if (!player1Joined && Keyboard.current != null)
+        {
+            if (Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.anyKey.wasPressedThisFrame)
+            {
+                Debug.Log("[Manager] Input detected for Player 1. Spawning...");
+                JoinPlayer(0, "KeyboardLeft", Keyboard.current, player1Spawn != null ? player1Spawn.position : Vector3.zero);
+                player1Joined = true;
+            }
+        }
+
+        // Join Player 2: Gamepad (A)
         if (!player2Joined && Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
         {
-            JoinPlayer(1, "Gamepad", Gamepad.current, player2Spawn.position);
+            Debug.Log("[Manager] Input detected for Player 2. Spawning...");
+            JoinPlayer(1, "Gamepad", Gamepad.current, player2Spawn != null ? player2Spawn.position : Vector3.right * 2f);
             player2Joined = true;
         }
     }
 
     private void JoinPlayer(int playerIndex, string schemeName, InputDevice device, Vector3 spawnPosition)
     {
-        // Pair device manually
+        if (playerPrefab == null) {
+            Debug.LogError("[Manager] Cannot spawn: Prefab is null");
+            return;
+        }
+
         PlayerInput pi = PlayerInput.Instantiate(
             playerPrefab, 
             playerIndex: playerIndex, 
@@ -71,16 +80,24 @@ public class LocalMultiplayerManager : MonoBehaviour
 
         if (pi != null)
         {
+            if (playerIndex == 0 && Mouse.current != null)
+            {
+                InputUser.PerformPairingWithDevice(Mouse.current, pi.user);
+            }
+
             pi.transform.position = spawnPosition;
             pi.transform.rotation = Quaternion.identity;
 
-            // Initialize Camera Setup
             PlayerCameraSetup camSetup = pi.GetComponent<PlayerCameraSetup>();
             if (camSetup == null) camSetup = pi.gameObject.AddComponent<PlayerCameraSetup>();
             
             camSetup.Initialize(playerIndex);
             
-            Debug.Log($"LocalMultiplayerManager: Player {playerIndex} joined with scheme {schemeName}");
+            Debug.Log($"[Manager] SUCCESS: Player {playerIndex} spawned at {spawnPosition}");
+        }
+        else
+        {
+            Debug.LogError($"[Manager] FAILED to instantiate Player {playerIndex} with scheme {schemeName}");
         }
     }
 }

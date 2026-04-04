@@ -76,6 +76,17 @@ namespace Climbing
             characterDetection = GetComponent<DetectionCharacterController>();
             vaultingController = GetComponent<VaultingController>();
 
+            // --- AUTO-ASSIGN COLLIDERS ---
+            if (normalCapsuleCollider == null || slidingCapsuleCollider == null)
+            {
+                CapsuleCollider[] colliders = GetComponents<CapsuleCollider>();
+                if (colliders.Length > 0)
+                {
+                    if (normalCapsuleCollider == null) normalCapsuleCollider = colliders[0];
+                    if (slidingCapsuleCollider == null) slidingCapsuleCollider = (colliders.Length > 1) ? colliders[1] : colliders[0];
+                }
+            }
+
             // --- LOCAL MULTIPLAYER FIX ---
             // If cameras aren't assigned, look for a Camera component in children
             if (mainCamera == null || freeCamera == null)
