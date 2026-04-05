@@ -11,6 +11,7 @@ TagManager:
   - Deep Jump
   - Ground
   - Box
+  - Climb
   layers:
   - Default
   - TransparentFX
